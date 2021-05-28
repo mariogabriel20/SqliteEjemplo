@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button btnCreate;
     private Button btnDelete;
+    private Button btnDeleteAll;
 
     private CarsSQLiteHelper carsHelper;
     private SQLiteDatabase db;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         cars = new ArrayList<Car>();
         btnCreate = (Button) findViewById(R.id.buttonCreate);
         btnDelete = (Button) findViewById(R.id.buttonDelete);
+        btnDeleteAll = (Button) findViewById(R.id.buttonDeleteAll);
 
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,10 +51,19 @@ public class MainActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                removeLast();
+                update();
+            }
+        });
+
+        btnDeleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 removeAll();
                 update();
             }
         });
+
         //Abrimos la BD 'DBtest' en modo escritura
         carsHelper = new CarsSQLiteHelper(this, "DBTest", null, 1);
         db = carsHelper.getWritableDatabase();
@@ -97,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeAll(){
         db.delete("Cars","",null);
+    }
+
+    private void removeLast(){
+        Cursor cursor = db.rawQuery("SELECT id from Cars", new String[]{});
+        cursor.moveToLast();
+        int lastId = cursor.getInt(0);
+        db.delete("Cars","id="+lastId,null);
     }
 
     private void update() {
